@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %} ToDo List {% endblock title %}
+
+
+{% block body %}
+
+<div class="header-bar">
+    <div>
+        <h1>Welcome {{request.user|title}}</h1>
+        <h3 style="margin: 0;">You have <i>{{count}} incomplete task{{ count|pluralize:"'s" }} </i></h3>
+    </div>
+    <div><a class="btn btn-dark" type="button" href="{% url 'logout' %}">Log Out</a>
+    </div>
+</div>
+
+
+
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li style="list-style-type: none;" {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+
+
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<form action="{% url 'index' %}" method="post">
+    {% csrf_token %}
+
+    {{form.title}}
+
+    <input type="submit" value="Add" />
+</form>
+
+
+<table>
+
+    <tr>
+        <th>No.</th>
+        <th>Task</th>
+        <th>Progress</th>
+        <th colspan="2" style="text-align: center;">Action</th>
+    </tr>
+
+    {% for task in tasks %}
+
+
+    <tr>
+        <td>{{forloop.counter}})</td>
+        <td>
+            <div class="TaskTable">
+                {{task}}
+            </div>
+        </td>
+        {% if task.complete %}
+        <td class="text-success"><i>Complete</i></td>
+
+        {% else %}
+
+        <td class="text-warning Progress"><i>In Progress</i></td>
+
+        {% endif %}
+
+        <td><button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#{{task.id}}">
+                View
+            </button>
+        </td>
+        <td><a href="{% url 'update' task.id  %}" class="btn btn-warning btn-xs">Update</a></td>
+        <td><a href="{% url 'delete' task.id  %}" class="btn btn-danger btn-xs">Delete</a></td>
+
+    </tr>
+
+
+
+    {% include 'base/view.html' %}
+    {% endfor %}
+
+
+</table>
+
+{% endblock body %}
